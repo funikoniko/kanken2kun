@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbfaf7">
+<title>訓読み書き取り 130語｜音読みヒント</title>
+<style>
+:root{--ink:#202737;--sub:#647084;--surface:#fff;--line:#dfe4e9;--blue:#345e9b;--blue-tint:#eff4fb;--ok:#176448;--ok-bg:#e9f5ee;--mid:#825d19;--mid-bg:#fdf4df;--bad:#a13f40;--bad-bg:#fdf0ef;--bg:#f7f8fa;--shadow:0 5px 20px rgba(30,50,80,.045)}
+*{box-sizing:border-box}
+html{color-scheme:light;font-size:16px}
+body{margin:0;min-width:280px;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,sans-serif;color:var(--ink);line-height:1.55}
+button,select{font:inherit;-webkit-tap-highlight-color:transparent}
+button{cursor:pointer;touch-action:manipulation}
+button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #87afe0;outline-offset:2px}
+button:disabled{opacity:.45;cursor:default}
+.shell{max-width:720px;margin:0 auto;padding:18px 15px max(44px,env(safe-area-inset-bottom))}
+.header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1{font-size:22px;line-height:1.32;margin:0 0 3px;letter-spacing:.01em}
+.kicker{font-size:11px;letter-spacing:.095em;color:var(--blue);font-weight:800;margin-bottom:6px}
+.subline{font-size:12px;color:var(--sub)}
+.pill{font-size:11px;border:1px solid var(--line);border-radius:100px;padding:5px 9px;white-space:nowrap;background:#fff;color:var(--sub);max-width:146px;text-align:center}
+.pill.warning{color:var(--bad);background:var(--bad-bg);border-color:#f5c5c5}
+.toolbar{display:grid;grid-template-columns: minmax(0,1fr) auto;gap:9px;align-items:center;margin-bottom:13px}
+select{min-width:0;width:100%;height:42px;border-radius:11px;border:1px solid var(--line);color:var(--ink);padding:0 10px;background:white}
+.stat{font-size:12px;color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums}
+.track{height:6px;border-radius:99px;background:#e5eaf0;overflow:hidden;margin-bottom:16px}
+.track-fill{height:100%;background:var(--blue);width:0;transition:width .2s}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:21px 17px 18px;margin-bottom:12px;min-height:365px}
+.cardtop{display:flex;align-items:center;justify-content:space-between;gap:7px;color:var(--sub);font-size:12px}
+.count{font-variant-numeric:tabular-nums;font-weight:700;color:#344259}
+.tag{font-size:11px;color:#4b6580;background:var(--blue-tint);padding:3px 8px;border-radius:99px}
+.promptlabel{font-size:13px;color:var(--sub);margin-top:22px;margin-bottom:5px}
+.example{font-size:clamp(23px,6vw,33px);font-weight:750;line-height:1.75;overflow-wrap:anywhere;letter-spacing:.016em;min-height:70px}
+.target{box-shadow:inset 0 -0.25em 0 #fff0c5}
+.reading{color:#4b5d73;font-size:13px;margin:4px 0 18px}
+.reveal{background:var(--blue-tint);padding:15px 16px;border-radius:13px;margin:14px 0 15px;animation:show .12s ease}
+@keyframes show{from{opacity:.3;transform:translateY(3px)}to{opacity:1;transform:none}}
+.mini{font-size:12px;color:#687b94;font-weight:650;margin-bottom:4px}
+.kana{font-weight:800;font-size:25px;letter-spacing:.03em}
+.answer{font-size:34px;line-height:1.5;font-weight:800;letter-spacing:.045em}
+.reveal hr{border:0;border-top:1px solid #d3dfed;margin:11px 0}
+.onkan{font-weight:800;font-size:24px}
+.meaning{font-size:13px;color:#52637b;margin-top:6px;line-height:1.65}
+.actions{display:flex;flex-direction:column;gap:10px;margin:8px 0 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;border-radius:12px;border:1px solid transparent;min-height:49px;padding:11px 12px;font-weight:700;background:#fff;color:var(--ink)}
+.btn.primary{background:var(--blue);color:white}
+.btn.secondary{border-color:#bdcde1;color:var(--blue);background:#fff}
+.btn.soft{border-color:var(--line);background:#fff}
+.btn.good{color:var(--ok);border-color:#b1d8c5;background:var(--ok-bg)}
+.btn.hinted{color:var(--mid);border-color:#e9d5a2;background:var(--mid-bg)}
+.btn.bad{color:var(--bad);border-color:#ebc2bd;background:var(--bad-bg)}
+.grades{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grades .hinted{grid-column:1 / -1}
+.grade-status{font-size:13px;text-align:center;background:#f4f7fa;padding:10px;border-radius:10px;margin:7px 0 9px}
+.footnav{display:flex;gap:8px;margin-top:12px}
+.footnav>*{flex:1}
+.footer{margin-top:17px;border:1px solid var(--line);background:white;border-radius:16px;padding:0 14px}
+summary{padding:15px 0;font-size:14px;font-weight:750;cursor:pointer}
+.footer-content{border-top:1px solid var(--line);padding:12px 0 17px}
+.helptext{font-size:12px;color:var(--sub);margin:0 0 12px;line-height:1.75}
+.data-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.data-actions .btn{min-height:44px;font-size:13px;font-weight:650}
+label.filelabel{display:flex;align-items:center;justify-content:center;min-height:44px;font-size:13px;border:1px solid var(--line);border-radius:12px;font-weight:650;color:var(--ink);cursor:pointer;padding:6px}
+#fileInput{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.smallnote{font-size:11px;color:#687487;margin:10px 0 0;line-height:1.65}
+.empty{padding:30px 12px;text-align:center;font-size:15px;color:var(--sub)}
+.bottom-note{margin-top:12px;font-size:11px;line-height:1.65;color:#778394}
+#toast{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);background:#202d40;color:#fff;padding:9px 14px;border-radius:14px;font-size:13px;box-shadow:0 8px 22px #1b2c4d30;max-width:95%;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;z-index:20}
+#toast.visible{opacity:1}
+@media(min-width:700px){.shell{padding:24px}.card{padding:27px 28px 24px}.grades{grid-template-columns:1fr 1fr 1fr}.grades .hinted{grid-column:auto}}
+@media(max-width:355px){.shell{padding:12px 9px}.card{padding:17px 13px}.example{font-size:23px}.header h1{font-size:19px}.stat{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.track-fill,.reveal,#toast{transition:none;animation:none}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="header">
+    <div>
+      <div class="kicker">KANJI TRAINER · 130 WORDS</div>
+      <h1>訓読みの書き取り</h1>
+      <div class="subline">例文 → ひらがなヒント → 正解 → 自己採点</div>
+    </div>
+    <div class="pill" id="saveState" aria-live="polite">保存状況を確認中</div>
+  </header>
+  <div class="toolbar">
+    <select id="filter" aria-label="学習する問題を選択">
+      <option value="all">全130問・番号順</option>
+      <option value="unanswered">未学習の問題</option>
+      <option value="review">要復習（△・×）</option>
+      <option value="incorrect">不正解（×）のみ</option>
+      <option value="random">全130問・ランダム</option>
+    </select>
+    <div class="stat" id="stats">学習済み 0 / 130</div>
+  </div>
+  <div class="track" aria-hidden="true"><div class="track-fill" id="progress"></div></div>
+  <section class="card" id="questionCard" aria-live="polite">
+    <div class="cardtop"><span class="count" id="questionCount"></span><span class="tag" id="questionTag"></span></div>
+    <div class="promptlabel">下線部分を漢字と送り仮名で書きましょう</div>
+    <div class="example" id="example"></div>
+    <div class="reading" id="reading"></div>
+    <div class="reveal" id="hintBox" hidden><div class="mini">音読みヒント（ひらがな）</div><div class="kana" id="hintKana"></div></div>
+    <div class="reveal" id="answerBox" hidden>
+      <div class="mini">訓読みの正解</div><div class="answer" id="answer"></div>
+      <hr><div class="mini">音読みヒントの漢字</div><div class="onkan" id="hintKanji"></div>
+      <div class="meaning" id="meaning"></div>
+    </div>
+    <div class="actions" id="actions"></div>
+    <div class="grade-status" id="lastStatus" hidden></div>
+    <div class="footnav" id="navigation"></div>
+  </section>
+  <div class="footer">
+    <details>
+      <summary>学習記録の保存・Excelへの書き出し</summary>
+      <div class="footer-content">
+        <p class="helptext">採点結果は、このページを開いたブラウザ内に保存します。端末を変更すると自動では引き継がれません。定期的にCSVを保存してください。CSVはExcelで開けます。採点の履歴は同じ問題を複数回解いた場合も残ります。</p>
+        <div class="data-actions">
+          <button class="btn secondary" type="button" id="csvExport">採点履歴CSVを保存</button>
+          <label class="filelabel" for="fileInput">CSV/JSONを読み込む</label>
+          <input id="fileInput" type="file" accept=".csv,.json,text/csv,application/json">
+          <button class="btn soft" type="button" id="jsonExport">バックアップJSON</button>
+          <button class="btn soft" type="button" id="resetHistory">記録を初期化</button>
+        </div>
+        <p class="smallnote">SafariのプライベートブラウズやローカルHTMLの表示方法によっては保存が維持されない場合があります。記録が重要ならHTTPSで公開したページを通常モードで開き、CSV/JSONのバックアップも保存してください。漢字と送り仮名の書き取りは、iPadのメモアプリなどで行い、このページで自己採点してください。</p>
+      </div>
+    </details>
+  </div>
+  <p class="bottom-note">漢検2級を目標とする独自選定130語（公式の出題頻度・級別語彙一覧ではありません）。ヒントは原則として、同じ漢字を含む音読み熟語です。</p>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+'use strict';
+const WORDS = [{"id":1,"group":"A・社会","reading":"つのる","hintKana":"ぼしゅう","hintKanji":"募集","answer":"募る","targetKanji":"募","example":"参加者をつのる。","meaning":"広く集める","url":"https://www.kanjipedia.jp/search?k=%E5%8B%9F&kt=1&sk=leftHand"},{"id":2,"group":"A・社会","reading":"うながす","hintKana":"そくしん","hintKanji":"促進","answer":"促す","targetKanji":"促","example":"提出をうながす。","meaning":"早く行うよう働きかける","url":"https://www.kanjipedia.jp/search?k=%E4%BF%83&kt=1&sk=leftHand"},{"id":3,"group":"A・社会","reading":"さまたげる","hintKana":"ぼうがい","hintKanji":"妨害","answer":"妨げる","targetKanji":"妨","example":"通行をさまたげる。","meaning":"邪魔をする","url":"https://www.kanjipedia.jp/search?k=%E5%A6%A8&kt=1&sk=leftHand"},{"id":4,"group":"A・社会","reading":"はばむ","hintKana":"そし","hintKanji":"阻止","answer":"阻む","targetKanji":"阻","example":"進行をはばむ。","meaning":"進みを食い止める","url":"https://www.kanjipedia.jp/search?k=%E9%98%BB&kt=1&sk=leftHand"},{"id":5,"group":"A・社会","reading":"くわだてる","hintKana":"きかく","hintKanji":"企画","answer":"企てる","targetKanji":"企","example":"新しい事業をくわだてる。","meaning":"計画する","url":"https://www.kanjipedia.jp/search?k=%E4%BC%81&kt=1&sk=leftHand"},{"id":6,"group":"A・社会","reading":"たずさえる","hintKana":"けいたい","hintKanji":"携帯","answer":"携える","targetKanji":"携","example":"資料をたずさえて訪問する。","meaning":"手に持って行く","url":"https://www.kanjipedia.jp/search?k=%E6%90%BA&kt=1&sk=leftHand"},{"id":7,"group":"A・社会","reading":"たずさわる","hintKana":"けいたい","hintKanji":"携帯","answer":"携わる","targetKanji":"携","example":"教育にたずさわる。","meaning":"仕事などに関係する","url":"https://www.kanjipedia.jp/search?k=%E6%90%BA&kt=1&sk=leftHand"},{"id":8,"group":"A・社会","reading":"つちかう","hintKana":"さいばい","hintKanji":"栽培","answer":"培う","targetKanji":"培","example":"対話を通じて信頼をつちかう。","meaning":"育てて養う","url":"https://www.kanjipedia.jp/search?k=%E5%9F%B9&kt=1&sk=leftHand"},{"id":9,"group":"A・社会","reading":"つぐなう","hintKana":"ばいしょう","hintKanji":"賠償","answer":"償う","targetKanji":"償","example":"自らの過ちをつぐなう。","meaning":"損失や罪を埋め合わせる","url":"https://www.kanjipedia.jp/search?k=%E5%84%9F&kt=1&sk=leftHand"},{"id":10,"group":"A・社会","reading":"おもむく","hintKana":"ふにん","hintKanji":"赴任","answer":"赴く","targetKanji":"赴","example":"調査のため現地におもむく。","meaning":"その場所へ向かう","url":"https://www.kanjipedia.jp/search?k=%E8%B5%B4&kt=1&sk=leftHand"},{"id":11,"group":"A・社会","reading":"かえりみる","hintKana":"かいこ","hintKanji":"回顧","answer":"顧みる","targetKanji":"顧","example":"過去をかえりみる。","meaning":"振り返って思う","url":"https://www.kanjipedia.jp/search?k=%E9%A1%A7&kt=1&sk=leftHand"},{"id":12,"group":"A・社会","reading":"かえりみる","hintKana":"はんせい","hintKanji":"反省","answer":"省みる","targetKanji":"省","example":"自分の行いをかえりみる。","meaning":"反省して振り返る","url":"https://www.kanjipedia.jp/search?k=%E7%9C%81&kt=1&sk=leftHand"},{"id":13,"group":"A・社会","reading":"ほこる","hintKana":"こじ","hintKanji":"誇示","answer":"誇る","targetKanji":"誇","example":"長い歴史をほこる。","meaning":"自慢に思う","url":"https://www.kanjipedia.jp/search?k=%E8%AA%87&kt=1&sk=leftHand"},{"id":14,"group":"A・社会","reading":"みちびく","hintKana":"しどう","hintKanji":"指導","answer":"導く","targetKanji":"導","example":"生徒を正解へみちびく。","meaning":"案内し方向を示す","url":"https://www.kanjipedia.jp/search?k=%E5%B0%8E&kt=1&sk=leftHand"},{"id":15,"group":"A・社会","reading":"ひきいる","hintKana":"とうそつ","hintKanji":"統率","answer":"率いる","targetKanji":"率","example":"代表団をひきいる。","meaning":"集団の先頭に立つ","url":"https://www.kanjipedia.jp/search?k=%E7%8E%87&kt=1&sk=leftHand"},{"id":16,"group":"A・社会","reading":"さとす","hintKana":"せつゆ","hintKanji":"説諭","answer":"諭す","targetKanji":"諭","example":"相手に道理をさとす。","meaning":"わかるように説く","url":"https://www.kanjipedia.jp/search?k=%E8%AB%AD&kt=1&sk=leftHand"},{"id":17,"group":"A・社会","reading":"かかげる","hintKana":"けいじ","hintKanji":"掲示","answer":"掲げる","targetKanji":"掲","example":"新たな目標をかかげる。","meaning":"目立つように示す","url":"https://www.kanjipedia.jp/search?k=%E6%8E%B2&kt=1&sk=leftHand"},{"id":18,"group":"A・社会","reading":"したう","hintKana":"ぼじょう","hintKanji":"慕情","answer":"慕う","targetKanji":"慕","example":"恩師をしたう。","meaning":"恋しく思い敬う","url":"https://www.kanjipedia.jp/search?k=%E6%85%95&kt=1&sk=leftHand"},{"id":19,"group":"A・社会","reading":"いこう","hintKana":"きゅうけい","hintKanji":"休憩","answer":"憩う","targetKanji":"憩","example":"木陰でしばしいこう。","meaning":"休んでくつろぐ","url":"https://www.kanjipedia.jp/search?k=%E6%86%A9&kt=1&sk=leftHand"},{"id":20,"group":"A・社会","reading":"なげく","hintKana":"たんそく","hintKanji":"嘆息","answer":"嘆く","targetKanji":"嘆","example":"事態の悪化をなげく。","meaning":"悲しんでため息をつく","url":"https://www.kanjipedia.jp/search?k=%E5%98%86&kt=1&sk=leftHand"},{"id":21,"group":"A・社会","reading":"あざむく","hintKana":"さぎ","hintKanji":"詐欺","answer":"欺く","targetKanji":"欺","example":"人の目をあざむく。","meaning":"だまして信じ込ませる","url":"https://www.kanjipedia.jp/search?k=%E6%AC%BA&kt=1&sk=leftHand"},{"id":22,"group":"A・社会","reading":"あなどる","hintKana":"ぶじょく","hintKanji":"侮辱","answer":"侮る","targetKanji":"侮","example":"相手の力をあなどる。","meaning":"軽く見てばかにする","url":"https://www.kanjipedia.jp/search?k=%E4%BE%AE&kt=1&sk=leftHand"},{"id":23,"group":"A・社会","reading":"つつしむ","hintKana":"しんちょう","hintKanji":"慎重","answer":"慎む","targetKanji":"慎","example":"軽率な言動をつつしむ。","meaning":"控えめにする","url":"https://www.kanjipedia.jp/search?k=%E6%85%8E&kt=1&sk=leftHand"},{"id":24,"group":"A・社会","reading":"つつしむ","hintKana":"きんしん","hintKanji":"謹慎","answer":"謹む","targetKanji":"謹","example":"つつしんでお祝いを申し上げる。","meaning":"礼儀正しくかしこまる","url":"https://www.kanjipedia.jp/search?k=%E8%AC%B9&kt=1&sk=leftHand"},{"id":25,"group":"A・社会","reading":"さずける","hintKana":"じゅぎょう","hintKanji":"授業","answer":"授ける","targetKanji":"授","example":"技術を弟子にさずける。","meaning":"教えたり与えたりする","url":"https://www.kanjipedia.jp/search?k=%E6%8E%88&kt=1&sk=leftHand"},{"id":26,"group":"A・社会","reading":"さずかる","hintKana":"じゅぎょう","hintKanji":"授業","answer":"授かる","targetKanji":"授","example":"新しい命をさずかる。","meaning":"与えられて受け取る","url":"https://www.kanjipedia.jp/search?k=%E6%8E%88&kt=1&sk=leftHand"},{"id":27,"group":"A・社会","reading":"そそのかす","hintKana":"きょうさ","hintKanji":"教唆","answer":"唆す","targetKanji":"唆","example":"友人をそそのかして悪事に誘う。","meaning":"よくない行動をするよう仕向ける","url":"https://www.kanjipedia.jp/search?k=%E5%94%86&kt=1&sk=leftHand"},{"id":28,"group":"A・社会","reading":"いましめる","hintKana":"けいかい","hintKanji":"警戒","answer":"戒める","targetKanji":"戒","example":"過去の失敗をいましめる。","meaning":"注意して慎むようにする","url":"https://www.kanjipedia.jp/search?k=%E6%88%92&kt=1&sk=leftHand"},{"id":29,"group":"A・社会","reading":"すすめる","hintKana":"かんこく","hintKanji":"勧告","answer":"勧める","targetKanji":"勧","example":"医師が休養をすすめる。","meaning":"人に行動を勧告する","url":"https://www.kanjipedia.jp/search?k=%E5%8B%A7&kt=1&sk=leftHand"},{"id":30,"group":"A・社会","reading":"すすめる","hintKana":"すいせん","hintKanji":"推薦","answer":"薦める","targetKanji":"薦","example":"友人に良書をすすめる。","meaning":"よいものとして推薦する","url":"https://www.kanjipedia.jp/search?k=%E8%96%A6&kt=1&sk=leftHand"},{"id":31,"group":"A・社会","reading":"はげます","hintKana":"げきれい","hintKanji":"激励","answer":"励ます","targetKanji":"励","example":"落ち込む友人をはげます。","meaning":"元気や勇気を与える","url":"https://www.kanjipedia.jp/search?k=%E5%8A%B1&kt=1&sk=leftHand"},{"id":32,"group":"A・社会","reading":"はげむ","hintKana":"げきれい","hintKanji":"激励","answer":"励む","targetKanji":"励","example":"毎日の練習にはげむ。","meaning":"努力を続ける","url":"https://www.kanjipedia.jp/search?k=%E5%8A%B1&kt=1&sk=leftHand"},{"id":33,"group":"A・社会","reading":"なぐさめる","hintKana":"いもん","hintKanji":"慰問","answer":"慰める","targetKanji":"慰","example":"悲しむ人をなぐさめる。","meaning":"心を安らかにする","url":"https://www.kanjipedia.jp/search?k=%E6%85%B0&kt=1&sk=leftHand"},{"id":34,"group":"A・社会","reading":"あがめる","hintKana":"すうはい","hintKanji":"崇拝","answer":"崇める","targetKanji":"崇","example":"神としてあがめる。","meaning":"高く尊んで敬う","url":"https://www.kanjipedia.jp/search?k=%E5%B4%87&kt=1&sk=leftHand"},{"id":35,"group":"A・社会","reading":"たまわる","hintKana":"しよ","hintKanji":"賜与","answer":"賜る","targetKanji":"賜","example":"ご指導をたまわる。","meaning":"目上の人からいただく","url":"https://www.kanjipedia.jp/search?k=%E8%B3%9C&kt=1&sk=leftHand"},{"id":36,"group":"A・社会","reading":"とぼしい","hintKana":"けつぼう","hintKanji":"欠乏","answer":"乏しい","targetKanji":"乏","example":"時間がとぼしい。","meaning":"十分でない","url":"https://www.kanjipedia.jp/search?k=%E4%B9%8F&kt=1&sk=leftHand"},{"id":37,"group":"A・社会","reading":"おこたる","hintKana":"たいまん","hintKanji":"怠慢","answer":"怠る","targetKanji":"怠","example":"安全確認をおこたる。","meaning":"すべきことをしない","url":"https://www.kanjipedia.jp/search?k=%E6%80%A0&kt=1&sk=leftHand"},{"id":38,"group":"A・社会","reading":"なまける","hintKana":"たいまん","hintKanji":"怠慢","answer":"怠ける","targetKanji":"怠","example":"宿題をなまける。","meaning":"努力をせずさぼる","url":"https://www.kanjipedia.jp/search?k=%E6%80%A0&kt=1&sk=leftHand"},{"id":39,"group":"A・社会","reading":"かたむく","hintKana":"けいしゃ","hintKanji":"傾斜","answer":"傾く","targetKanji":"傾","example":"古い建物がかたむく。","meaning":"一方に斜めになる","url":"https://www.kanjipedia.jp/search?k=%E5%82%BE&kt=1&sk=leftHand"},{"id":40,"group":"A・社会","reading":"いきどおる","hintKana":"ぎふん","hintKanji":"義憤","answer":"憤る","targetKanji":"憤","example":"不当な処遇にいきどおる。","meaning":"強く怒る","url":"https://www.kanjipedia.jp/search?k=%E6%86%A4&kt=1&sk=leftHand"},{"id":41,"group":"B・状態","reading":"うるおう","hintKana":"じゅんかつ","hintKanji":"潤滑","answer":"潤う","targetKanji":"潤","example":"雨で畑がうるおう。","meaning":"水分や豊かさを得る","url":"https://www.kanjipedia.jp/search?k=%E6%BD%A4&kt=1&sk=leftHand"},{"id":42,"group":"B・状態","reading":"うるおす","hintKana":"じゅんたく","hintKanji":"潤沢","answer":"潤す","targetKanji":"潤","example":"水で喉をうるおす。","meaning":"湿らせる・満たす","url":"https://www.kanjipedia.jp/search?k=%E6%BD%A4&kt=1&sk=leftHand"},{"id":43,"group":"B・状態","reading":"ただよう","hintKana":"ひょうりゅう","hintKanji":"漂流","answer":"漂う","targetKanji":"漂","example":"甘い香りがただよう。","meaning":"宙や水上に浮き動く","url":"https://www.kanjipedia.jp/search?k=%E6%BC%82&kt=1&sk=leftHand"},{"id":44,"group":"B・状態","reading":"とどこおる","hintKana":"ていたい","hintKanji":"停滞","answer":"滞る","targetKanji":"滞","example":"作業がとどこおる。","meaning":"順調に進まない","url":"https://www.kanjipedia.jp/search?k=%E6%BB%9E&kt=1&sk=leftHand"},{"id":45,"group":"B・状態","reading":"ひそむ","hintKana":"せんぷく","hintKanji":"潜伏","answer":"潜む","targetKanji":"潜","example":"思わぬ危険がひそむ。","meaning":"隠れて存在する","url":"https://www.kanjipedia.jp/search?k=%E6%BD%9C&kt=1&sk=leftHand"},{"id":46,"group":"B・状態","reading":"もぐる","hintKana":"せんすい","hintKanji":"潜水","answer":"潜る","targetKanji":"潜","example":"川の底にもぐる。","meaning":"水中などに入る","url":"https://www.kanjipedia.jp/search?k=%E6%BD%9C&kt=1&sk=leftHand"},{"id":47,"group":"B・状態","reading":"ひたる","hintKana":"しんすい","hintKanji":"浸水","answer":"浸る","targetKanji":"浸","example":"思い出にひたる。","meaning":"深く入り込む・満ちた状態になる","url":"https://www.kanjipedia.jp/search?k=%E6%B5%B8&kt=1&sk=leftHand"},{"id":48,"group":"B・状態","reading":"ひたす","hintKana":"しんすい","hintKanji":"浸水","answer":"浸す","targetKanji":"浸","example":"布を水にひたす。","meaning":"液体に入れて染み込ませる","url":"https://www.kanjipedia.jp/search?k=%E6%B5%B8&kt=1&sk=leftHand"},{"id":49,"group":"B・状態","reading":"おおう","hintKana":"ひふく","hintKanji":"被覆","answer":"覆う","targetKanji":"覆","example":"雲が空をおおう。","meaning":"一面にかぶせる","url":"https://www.kanjipedia.jp/search?k=%E8%A6%86&kt=1&sk=leftHand"},{"id":50,"group":"B・状態","reading":"おちいる","hintKana":"かんぼつ","hintKanji":"陥没","answer":"陥る","targetKanji":"陥","example":"困難な状況におちいる。","meaning":"好ましくない状態になる","url":"https://www.kanjipedia.jp/search?k=%E9%99%A5&kt=1&sk=leftHand"},{"id":51,"group":"B・状態","reading":"おとしいれる","hintKana":"かんらく","hintKanji":"陥落","answer":"陥れる","targetKanji":"陥","example":"相手をわなにおとしいれる。","meaning":"悪い状態に追い込む","url":"https://www.kanjipedia.jp/search?k=%E9%99%A5&kt=1&sk=leftHand"},{"id":52,"group":"B・状態","reading":"ゆるむ","hintKana":"かんわ","hintKanji":"緩和","answer":"緩む","targetKanji":"緩","example":"緊張がゆるむ。","meaning":"しまりが弱くなる","url":"https://www.kanjipedia.jp/search?k=%E7%B7%A9&kt=1&sk=leftHand"},{"id":53,"group":"B・状態","reading":"ゆるめる","hintKana":"かんわ","hintKanji":"緩和","answer":"緩める","targetKanji":"緩","example":"ネジを少しゆるめる。","meaning":"しまりを弱くする","url":"https://www.kanjipedia.jp/search?k=%E7%B7%A9&kt=1&sk=leftHand"},{"id":54,"group":"B・状態","reading":"おとろえる","hintKana":"すいたい","hintKanji":"衰退","answer":"衰える","targetKanji":"衰","example":"体力がおとろえる。","meaning":"勢いが弱くなる","url":"https://www.kanjipedia.jp/search?k=%E8%A1%B0&kt=1&sk=leftHand"},{"id":55,"group":"B・状態","reading":"にくむ","hintKana":"ぞうお","hintKanji":"憎悪","answer":"憎む","targetKanji":"憎","example":"暴力をにくむ。","meaning":"強く嫌う","url":"https://www.kanjipedia.jp/search?k=%E6%86%8E&kt=1&sk=leftHand"},{"id":56,"group":"B・状態","reading":"うらむ","hintKana":"えんこん","hintKanji":"怨恨","answer":"恨む","targetKanji":"恨","example":"約束を破った人をうらむ。","meaning":"不満や怒りを抱く","url":"https://www.kanjipedia.jp/search?k=%E6%81%A8&kt=1&sk=leftHand"},{"id":57,"group":"B・状態","reading":"うらやむ","hintKana":"せんぼう","hintKanji":"羨望","answer":"羨む","targetKanji":"羨","example":"友人の才能をうらやむ。","meaning":"自分もそうありたいと思う","url":"https://www.kanjipedia.jp/search?k=%E7%BE%A8&kt=1&sk=leftHand"},{"id":58,"group":"B・状態","reading":"くやむ","hintKana":"こうかい","hintKanji":"後悔","answer":"悔やむ","targetKanji":"悔","example":"不用意な発言をくやむ。","meaning":"失敗を残念に思う","url":"https://www.kanjipedia.jp/search?k=%E6%82%94&kt=1&sk=leftHand"},{"id":59,"group":"B・状態","reading":"くいる","hintKana":"こうかい","hintKanji":"後悔","answer":"悔いる","targetKanji":"悔","example":"自らの過ちをくいる。","meaning":"失敗を悔しく思う","url":"https://www.kanjipedia.jp/search?k=%E6%82%94&kt=1&sk=leftHand"},{"id":60,"group":"B・状態","reading":"まどう","hintKana":"とうわく","hintKanji":"当惑","answer":"惑う","targetKanji":"惑","example":"選択肢の多さにまどう。","meaning":"判断に迷う","url":"https://www.kanjipedia.jp/search?k=%E6%83%91&kt=1&sk=leftHand"},{"id":61,"group":"B・状態","reading":"まどわす","hintKana":"とうわく","hintKanji":"当惑","answer":"惑わす","targetKanji":"惑","example":"誤った情報が人をまどわす。","meaning":"判断を乱して迷わせる","url":"https://www.kanjipedia.jp/search?k=%E6%83%91&kt=1&sk=leftHand"},{"id":62,"group":"B・状態","reading":"あわてる","hintKana":"きょうこう","hintKanji":"恐慌","answer":"慌てる","targetKanji":"慌","example":"突然の知らせにあわてる。","meaning":"落ち着きを失う","url":"https://www.kanjipedia.jp/search?k=%E6%85%8C&kt=1&sk=leftHand"},{"id":63,"group":"B・状態","reading":"きびしい","hintKana":"げんかく","hintKanji":"厳格","answer":"厳しい","targetKanji":"厳","example":"審査がきびしい。","meaning":"容赦がない","url":"https://www.kanjipedia.jp/search?k=%E5%8E%B3&kt=1&sk=leftHand"},{"id":64,"group":"B・状態","reading":"おだやか","hintKana":"おんけん","hintKanji":"穏健","answer":"穏やか","targetKanji":"穏","example":"おだやかな海が広がる。","meaning":"静かで落ち着いている","url":"https://www.kanjipedia.jp/search?k=%E7%A9%8F&kt=1&sk=leftHand"},{"id":65,"group":"B・状態","reading":"けわしい","hintKana":"きけん","hintKanji":"危険","answer":"険しい","targetKanji":"険","example":"けわしい山道を進む。","meaning":"傾斜が急で危ない","url":"https://www.kanjipedia.jp/search?k=%E9%99%BA&kt=1&sk=leftHand"},{"id":66,"group":"B・状態","reading":"いちじるしい","hintKana":"けんちょ","hintKanji":"顕著","answer":"著しい","targetKanji":"著","example":"技術の進歩がいちじるしい。","meaning":"目立って程度が大きい","url":"https://www.kanjipedia.jp/search?k=%E8%91%97&kt=1&sk=leftHand"},{"id":67,"group":"B・状態","reading":"あわただしい","hintKana":"きょうこう","hintKanji":"恐慌","answer":"慌ただしい","targetKanji":"慌","example":"あわただしい朝を過ごす。","meaning":"落ち着かず忙しい","url":"https://www.kanjipedia.jp/search?k=%E6%85%8C&kt=1&sk=leftHand"},{"id":68,"group":"B・状態","reading":"わずらわしい","hintKana":"はんざつ","hintKanji":"煩雑","answer":"煩わしい","targetKanji":"煩","example":"手続きがわずらわしい。","meaning":"面倒で厄介だ","url":"https://www.kanjipedia.jp/search?k=%E7%85%A9&kt=1&sk=leftHand"},{"id":69,"group":"B・状態","reading":"わずらう","hintKana":"はんもん","hintKanji":"煩悶","answer":"煩う","targetKanji":"煩","example":"将来のことを思いわずらう。","meaning":"心を悩ませる","url":"https://www.kanjipedia.jp/search?k=%E7%85%A9&kt=1&sk=leftHand"},{"id":70,"group":"B・状態","reading":"わずらう","hintKana":"かんじゃ","hintKanji":"患者","answer":"患う","targetKanji":"患","example":"長く病気をわずらう。","meaning":"病気になる・病気で苦しむ","url":"https://www.kanjipedia.jp/search?k=%E6%82%A3&kt=1&sk=leftHand"},{"id":71,"group":"B・状態","reading":"あせる","hintKana":"しょうそう","hintKanji":"焦燥","answer":"焦る","targetKanji":"焦","example":"締め切りが迫ってあせる。","meaning":"気持ちが急く","url":"https://www.kanjipedia.jp/search?k=%E7%84%A6&kt=1&sk=leftHand"},{"id":72,"group":"B・状態","reading":"こがす","hintKana":"しょうど","hintKanji":"焦土","answer":"焦がす","targetKanji":"焦","example":"パンをこがす。","meaning":"熱で黒くする","url":"https://www.kanjipedia.jp/search?k=%E7%84%A6&kt=1&sk=leftHand"},{"id":73,"group":"B・状態","reading":"こげる","hintKana":"しょうど","hintKanji":"焦土","answer":"焦げる","targetKanji":"焦","example":"鍋の底がこげる。","meaning":"熱で黒くなる","url":"https://www.kanjipedia.jp/search?k=%E7%84%A6&kt=1&sk=leftHand"},{"id":74,"group":"B・状態","reading":"こごえる","hintKana":"とうけつ","hintKanji":"凍結","answer":"凍える","targetKanji":"凍","example":"寒さで手がこごえる。","meaning":"寒さで体が動かなくなる","url":"https://www.kanjipedia.jp/search?k=%E5%87%8D&kt=1&sk=leftHand"},{"id":75,"group":"B・状態","reading":"こおる","hintKana":"とうけつ","hintKanji":"凍結","answer":"凍る","targetKanji":"凍","example":"湖の水がこおる。","meaning":"低温で固まる","url":"https://www.kanjipedia.jp/search?k=%E5%87%8D&kt=1&sk=leftHand"},{"id":76,"group":"B・状態","reading":"かわく","hintKana":"かつぼう","hintKanji":"渇望","answer":"渇く","targetKanji":"渇","example":"運動して喉がかわく。","meaning":"水分が欲しくなる","url":"https://www.kanjipedia.jp/search?k=%E6%B8%87&kt=1&sk=leftHand"},{"id":77,"group":"B・状態","reading":"かわく","hintKana":"かんそう","hintKanji":"乾燥","answer":"乾く","targetKanji":"乾","example":"洗濯物がかわく。","meaning":"水分がなくなる","url":"https://www.kanjipedia.jp/search?k=%E4%B9%BE&kt=1&sk=leftHand"},{"id":78,"group":"B・状態","reading":"したたる","hintKana":"すいてき","hintKanji":"水滴","answer":"滴る","targetKanji":"滴","example":"屋根から雨水がしたたる。","meaning":"液体がしずくとなって落ちる","url":"https://www.kanjipedia.jp/search?k=%E6%BB%B4&kt=1&sk=leftHand"},{"id":79,"group":"B・状態","reading":"ふるえる","hintKana":"じしん","hintKanji":"地震","answer":"震える","targetKanji":"震","example":"寒さで体がふるえる。","meaning":"小刻みに揺れる","url":"https://www.kanjipedia.jp/search?k=%E9%9C%87&kt=1&sk=leftHand"},{"id":80,"group":"B・状態","reading":"ゆらぐ","hintKana":"どうよう","hintKanji":"動揺","answer":"揺らぐ","targetKanji":"揺","example":"決意がゆらぐ。","meaning":"安定しなくなる","url":"https://www.kanjipedia.jp/search?k=%E6%8F%BA&kt=1&sk=leftHand"},{"id":81,"group":"C・動作","reading":"つむぐ","hintKana":"ぼうせき","hintKanji":"紡績","answer":"紡ぐ","targetKanji":"紡","example":"経験を言葉につむぐ。","meaning":"繊維をより合わせる・話を作る","url":"https://www.kanjipedia.jp/search?k=%E7%B4%A1&kt=1&sk=leftHand"},{"id":82,"group":"C・動作","reading":"つくろう","hintKana":"しゅうぜん","hintKanji":"修繕","answer":"繕う","targetKanji":"繕","example":"破れた服をつくろう。","meaning":"傷んだ部分を直す","url":"https://www.kanjipedia.jp/search?k=%E7%B9%95&kt=1&sk=leftHand"},{"id":83,"group":"C・動作","reading":"ぬう","hintKana":"ほうごう","hintKanji":"縫合","answer":"縫う","targetKanji":"縫","example":"布の端をぬう。","meaning":"糸でつなぐ","url":"https://www.kanjipedia.jp/search?k=%E7%B8%AB&kt=1&sk=leftHand"},{"id":84,"group":"C・動作","reading":"あむ","hintKana":"へんしゅう","hintKanji":"編集","answer":"編む","targetKanji":"編","example":"短い詩集をあむ。","meaning":"組み合わせて作る","url":"https://www.kanjipedia.jp/search?k=%E7%B7%A8&kt=1&sk=leftHand"},{"id":85,"group":"C・動作","reading":"ほる","hintKana":"ちょうこく","hintKanji":"彫刻","answer":"彫る","targetKanji":"彫","example":"木に模様をほる。","meaning":"表面を削って形を作る","url":"https://www.kanjipedia.jp/search?k=%E5%BD%AB&kt=1&sk=leftHand"},{"id":86,"group":"C・動作","reading":"けずる","hintKana":"さくげん","hintKanji":"削減","answer":"削る","targetKanji":"削","example":"予算をけずる。","meaning":"一部を取り除く","url":"https://www.kanjipedia.jp/search?k=%E5%89%8A&kt=1&sk=leftHand"},{"id":87,"group":"C・動作","reading":"くだく","hintKana":"ふんさい","hintKanji":"粉砕","answer":"砕く","targetKanji":"砕","example":"大きな岩をくだく。","meaning":"細かく割る","url":"https://www.kanjipedia.jp/search?k=%E7%A0%95&kt=1&sk=leftHand"},{"id":88,"group":"C・動作","reading":"みがく","hintKana":"けんま","hintKanji":"研磨","answer":"磨く","targetKanji":"磨","example":"表現力をみがく。","meaning":"こすって滑らかにする・能力を高める","url":"https://www.kanjipedia.jp/search?k=%E7%A3%A8&kt=1&sk=leftHand"},{"id":89,"group":"C・動作","reading":"きたえる","hintKana":"たんれん","hintKanji":"鍛錬","answer":"鍛える","targetKanji":"鍛","example":"体をきたえる。","meaning":"強く育てる","url":"https://www.kanjipedia.jp/search?k=%E9%8D%9B&kt=1&sk=leftHand"},{"id":90,"group":"C・動作","reading":"いる","hintKana":"ちゅうぞう","hintKanji":"鋳造","answer":"鋳る","targetKanji":"鋳","example":"銅で鐘をいる。","meaning":"金属を溶かして型に流す","url":"https://www.kanjipedia.jp/search?k=%E9%8B%B3&kt=1&sk=leftHand"},{"id":91,"group":"C・動作","reading":"ねる","hintKana":"くんれん","hintKanji":"訓練","answer":"練る","targetKanji":"練","example":"新しい計画をねる。","meaning":"考えを十分に深める","url":"https://www.kanjipedia.jp/search?k=%E7%B7%B4&kt=1&sk=leftHand"},{"id":92,"group":"C・動作","reading":"しぼる","hintKana":"こうさつ","hintKanji":"絞殺","answer":"絞る","targetKanji":"絞","example":"ぬれたタオルをしぼる。","meaning":"ねじって水を出す・狭める","url":"https://www.kanjipedia.jp/search?k=%E7%B5%9E&kt=1&sk=leftHand"},{"id":93,"group":"C・動作","reading":"しぼる","hintKana":"さくしゅ","hintKanji":"搾取","answer":"搾る","targetKanji":"搾","example":"牛から乳をしぼる。","meaning":"圧力を加えて液を取り出す","url":"https://www.kanjipedia.jp/search?k=%E6%90%BE&kt=1&sk=leftHand"},{"id":94,"group":"C・動作","reading":"ぬぐう","hintKana":"ふっしょく","hintKanji":"払拭","answer":"拭う","targetKanji":"拭","example":"額の汗をぬぐう。","meaning":"ふき取る","url":"https://www.kanjipedia.jp/search?k=%E6%8B%AD&kt=1&sk=leftHand"},{"id":95,"group":"C・動作","reading":"はく","hintKana":"せいそう","hintKanji":"清掃","answer":"掃く","targetKanji":"掃","example":"玄関をほうきではく。","meaning":"ほうきなどで清める","url":"https://www.kanjipedia.jp/search?k=%E6%8E%83&kt=1&sk=leftHand"},{"id":96,"group":"C・動作","reading":"あやつる","hintKana":"そうさ","hintKanji":"操作","answer":"操る","targetKanji":"操","example":"人形を巧みにあやつる。","meaning":"思いどおりに動かす","url":"https://www.kanjipedia.jp/search?k=%E6%93%8D&kt=1&sk=leftHand"},{"id":97,"group":"C・動作","reading":"めぐる","hintKana":"じゅんかい","hintKanji":"巡回","answer":"巡る","targetKanji":"巡","example":"町の名所をめぐる。","meaning":"各所を順に回る","url":"https://www.kanjipedia.jp/search?k=%E5%B7%A1&kt=1&sk=leftHand"},{"id":98,"group":"C・動作","reading":"さえぎる","hintKana":"しゃだん","hintKanji":"遮断","answer":"遮る","targetKanji":"遮","example":"厚い雲が日差しをさえぎる。","meaning":"途中で妨げる","url":"https://www.kanjipedia.jp/search?k=%E9%81%AE&kt=1&sk=leftHand"},{"id":99,"group":"C・動作","reading":"おどす","hintKana":"きょうはく","hintKanji":"脅迫","answer":"脅す","targetKanji":"脅","example":"人をおどして従わせる。","meaning":"怖がらせる","url":"https://www.kanjipedia.jp/search?k=%E8%84%85&kt=1&sk=leftHand"},{"id":100,"group":"C・動作","reading":"おびやかす","hintKana":"きょうはく","hintKanji":"脅迫","answer":"脅かす","targetKanji":"脅","example":"感染症が暮らしをおびやかす。","meaning":"危険にさらす","url":"https://www.kanjipedia.jp/search?k=%E8%84%85&kt=1&sk=leftHand"},{"id":101,"group":"C・動作","reading":"めぐむ","hintKana":"おんけい","hintKanji":"恩恵","answer":"恵む","targetKanji":"恵","example":"困っている人に食物をめぐむ。","meaning":"情けをかけて与える","url":"https://www.kanjipedia.jp/search?k=%E6%81%B5&kt=1&sk=leftHand"},{"id":102,"group":"C・動作","reading":"まかなう","hintKana":"しゅうわい","hintKanji":"収賄","answer":"賄う","targetKanji":"賄","example":"交通費を自分でまかなう。","meaning":"費用などを用意して間に合わせる","url":"https://www.kanjipedia.jp/search?k=%E8%B3%84&kt=1&sk=leftHand"},{"id":103,"group":"C・動作","reading":"やとう","hintKana":"こよう","hintKanji":"雇用","answer":"雇う","targetKanji":"雇","example":"新しい職員をやとう。","meaning":"報酬を払って働いてもらう","url":"https://www.kanjipedia.jp/search?k=%E9%9B%87&kt=1&sk=leftHand"},{"id":104,"group":"C・動作","reading":"たくわえる","hintKana":"ちょちく","hintKanji":"貯蓄","answer":"蓄える","targetKanji":"蓄","example":"冬に備えて食料をたくわえる。","meaning":"集めて保存する","url":"https://www.kanjipedia.jp/search?k=%E8%93%84&kt=1&sk=leftHand"},{"id":105,"group":"C・動作","reading":"あずける","hintKana":"よきん","hintKanji":"預金","answer":"預ける","targetKanji":"預","example":"荷物を受付にあずける。","meaning":"一時的に任せる","url":"https://www.kanjipedia.jp/search?k=%E9%A0%90&kt=1&sk=leftHand"},{"id":106,"group":"C・動作","reading":"そこなう","hintKana":"そんしつ","hintKanji":"損失","answer":"損なう","targetKanji":"損","example":"健康をそこなう。","meaning":"傷つけて悪くする","url":"https://www.kanjipedia.jp/search?k=%E6%90%8D&kt=1&sk=leftHand"},{"id":107,"group":"C・動作","reading":"そこねる","hintKana":"そんしつ","hintKanji":"損失","answer":"損ねる","targetKanji":"損","example":"相手の機嫌をそこねる。","meaning":"害する・失敗する","url":"https://www.kanjipedia.jp/search?k=%E6%90%8D&kt=1&sk=leftHand"},{"id":108,"group":"C・動作","reading":"のがれる","hintKana":"とうそう","hintKanji":"逃走","answer":"逃れる","targetKanji":"逃","example":"危険からのがれる。","meaning":"危険などから離れる","url":"https://www.kanjipedia.jp/search?k=%E9%80%83&kt=1&sk=leftHand"},{"id":109,"group":"C・動作","reading":"まぬかれる","hintKana":"めんじょ","hintKanji":"免除","answer":"免れる","targetKanji":"免","example":"大きな被害をまぬかれる。","meaning":"悪いことを受けずに済む（まぬがれるとも読む）","url":"https://www.kanjipedia.jp/search?k=%E5%85%8D&kt=1&sk=leftHand"},{"id":110,"group":"C・動作","reading":"はぶく","hintKana":"しょうりゃく","hintKanji":"省略","answer":"省く","targetKanji":"省","example":"余分な説明をはぶく。","meaning":"取り除いて短くする","url":"https://www.kanjipedia.jp/search?k=%E7%9C%81&kt=1&sk=leftHand"},{"id":111,"group":"C・動作","reading":"たえる","hintKana":"たいきゅう","hintKanji":"耐久","answer":"耐える","targetKanji":"耐","example":"激しい寒さにたえる。","meaning":"苦しさを受け止めて持ちこたえる","url":"https://www.kanjipedia.jp/search?k=%E8%80%90&kt=1&sk=leftHand"},{"id":112,"group":"C・動作","reading":"ゆるす","hintKana":"しゃめん","hintKanji":"赦免","answer":"赦す","targetKanji":"赦","example":"過去の罪をゆるす。","meaning":"罪やとがを許して免じる","url":"https://www.kanjipedia.jp/search?k=%E8%B5%A6&kt=1&sk=leftHand"},{"id":113,"group":"C・動作","reading":"ゆるす","hintKana":"きょか","hintKanji":"許可","answer":"許す","targetKanji":"許","example":"外出をゆるす。","meaning":"認めて差し支えないとする","url":"https://www.kanjipedia.jp/search?k=%E8%A8%B1&kt=1&sk=leftHand"},{"id":114,"group":"C・動作","reading":"とらえる","hintKana":"ほそく","hintKanji":"捕捉","answer":"捉える","targetKanji":"捉","example":"問題の核心をとらえる。","meaning":"意味・本質をつかむ","url":"https://www.kanjipedia.jp/search?k=%E6%8D%89&kt=1&sk=leftHand"},{"id":115,"group":"C・動作","reading":"とらえる","hintKana":"たいほ","hintKanji":"逮捕","answer":"捕らえる","targetKanji":"捕","example":"逃走した犯人をとらえる。","meaning":"逃げないように捕まえる","url":"https://www.kanjipedia.jp/search?k=%E6%8D%95&kt=1&sk=leftHand"},{"id":116,"group":"C・動作","reading":"うばう","hintKana":"だっしゅ","hintKanji":"奪取","answer":"奪う","targetKanji":"奪","example":"人の自由をうばう。","meaning":"無理に取り上げる","url":"https://www.kanjipedia.jp/search?k=%E5%A5%AA&kt=1&sk=leftHand"},{"id":117,"group":"C・動作","reading":"おくる","hintKana":"ぞうてい","hintKanji":"贈呈","answer":"贈る","targetKanji":"贈","example":"卒業生に記念品をおくる。","meaning":"気持ちを込めて物を与える","url":"https://www.kanjipedia.jp/search?k=%E8%B4%88&kt=1&sk=leftHand"},{"id":118,"group":"C・動作","reading":"ほどこす","hintKana":"せじゅつ","hintKanji":"施術","answer":"施す","targetKanji":"施","example":"けが人に応急処置をほどこす。","meaning":"行って与える","url":"https://www.kanjipedia.jp/search?k=%E6%96%BD&kt=1&sk=leftHand"},{"id":119,"group":"C・動作","reading":"そなえる","hintKana":"じゅんび","hintKanji":"準備","answer":"備える","targetKanji":"備","example":"災害にそなえる。","meaning":"起こることに備えて準備する","url":"https://www.kanjipedia.jp/search?k=%E5%82%99&kt=1&sk=leftHand"},{"id":120,"group":"C・動作","reading":"そなえる","hintKana":"ていきょう","hintKanji":"提供","answer":"供える","targetKanji":"供","example":"仏前に花をそなえる。","meaning":"神仏や故人にささげる","url":"https://www.kanjipedia.jp/search?k=%E4%BE%9B&kt=1&sk=leftHand"},{"id":121,"group":"C・動作","reading":"ちかう","hintKana":"せいやく","hintKanji":"誓約","answer":"誓う","targetKanji":"誓","example":"再会をちかう。","meaning":"固く約束する","url":"https://www.kanjipedia.jp/search?k=%E8%AA%93&kt=1&sk=leftHand"},{"id":122,"group":"C・動作","reading":"とける","hintKana":"ようかい","hintKanji":"溶解","answer":"溶ける","targetKanji":"溶","example":"砂糖が水にとける。","meaning":"液体に混ざり込む","url":"https://www.kanjipedia.jp/search?k=%E6%BA%B6&kt=1&sk=leftHand"},{"id":123,"group":"C・動作","reading":"とける","hintKana":"かいけつ","hintKanji":"解決","answer":"解ける","targetKanji":"解","example":"難しい問題がとける。","meaning":"謎や問題の答えが見つかる","url":"https://www.kanjipedia.jp/search?k=%E8%A7%A3&kt=1&sk=leftHand"},{"id":124,"group":"C・動作","reading":"くずれる","hintKana":"ほうかい","hintKanji":"崩壊","answer":"崩れる","targetKanji":"崩","example":"雨で土砂がくずれる。","meaning":"まとまった形が壊れる","url":"https://www.kanjipedia.jp/search?k=%E5%B4%A9&kt=1&sk=leftHand"},{"id":125,"group":"C・動作","reading":"さく","hintKana":"はれつ","hintKanji":"破裂","answer":"裂く","targetKanji":"裂","example":"布を手でさく。","meaning":"引き離して破る","url":"https://www.kanjipedia.jp/search?k=%E8%A3%82&kt=1&sk=leftHand"},{"id":126,"group":"C・動作","reading":"さく","hintKana":"ぶんかつ","hintKanji":"分割","answer":"割く","targetKanji":"割","example":"勉強に時間をさく。","meaning":"全体の一部を別に充てる","url":"https://www.kanjipedia.jp/search?k=%E5%89%B2&kt=1&sk=leftHand"},{"id":127,"group":"C・動作","reading":"ののしる","hintKana":"ばとう","hintKanji":"罵倒","answer":"罵る","targetKanji":"罵","example":"他人を大声でののしる。","meaning":"ひどい言葉で悪く言う","url":"https://www.kanjipedia.jp/search?k=%E7%BD%B5&kt=1&sk=leftHand"},{"id":128,"group":"C・動作","reading":"よそおう","hintKana":"ふくそう","hintKanji":"服装","answer":"装う","targetKanji":"装","example":"平静をよそおう。","meaning":"そのように見せかける","url":"https://www.kanjipedia.jp/search?k=%E8%A3%85&kt=1&sk=leftHand"},{"id":129,"group":"C・動作","reading":"はかる","hintKana":"いんぼう","hintKanji":"陰謀","answer":"謀る","targetKanji":"謀","example":"権力の奪取をはかる。","meaning":"よくないことをたくらむ","url":"https://www.kanjipedia.jp/search?k=%E8%AC%80&kt=1&sk=leftHand"},{"id":130,"group":"C・動作","reading":"はかる","hintKana":"しもん","hintKanji":"諮問","answer":"諮る","targetKanji":"諮","example":"重要な案件を審議会にはかる。","meaning":"相談して意見を求める","url":"https://www.kanjipedia.jp/search?k=%E8%AB%AE&kt=1&sk=leftHand"}];
+const STORAGE_KEY='kanken_kunyomi_trainer_130_v1';
+const $=(id)=>document.getElementById(id);
+const allowedStatus=new Set(['○','△','×']);
+let attempts=[];
+let queue=[];
+let cursor=0;
+let stage=0; // 0: problem / 1: kana hint / 2: answer
+let usedHint=false;
+let justGraded=false;
+let persistAvailable=true;
+let toastTimer=null;
+function toast(msg){const node=$('toast');node.textContent=msg;node.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove('visible'),2400)}
+function storageRead(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    const stored=raw?JSON.parse(raw):null;
+    if(stored&&Array.isArray(stored.attempts)){attempts=stored.attempts.filter(validAttempt)}
+    localStorage.setItem(STORAGE_KEY,JSON.stringify({attempts}));
+    persistAvailable=true;
+  }catch(e){persistAvailable=false;attempts=[]}
+  showStorageStatus();
+}
+function validAttempt(a){return a&&Number.isInteger(a.id)&&a.id>=1&&a.id<=130&&allowedStatus.has(a.status)&&typeof a.at==='string'&&a.at.length>=10}
+function persist(){
+  if(!persistAvailable)return;
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({attempts}))}
+  catch(e){persistAvailable=false;showStorageStatus();toast('自動保存できません。CSVを保存してください')}
+}
+function showStorageStatus(){const p=$('saveState');p.textContent=persistAvailable?'この端末に記録':'自動保存不可';p.classList.toggle('warning',!persistAvailable);p.title=persistAvailable?'ブラウザ内に保存。CSVバックアップを推奨します':'CSVバックアップを必ず保存してください'}
+function latestMap(){let m=new Map();for(const a of attempts)m.set(a.id,a);return m}
+function buildQueue(mode){
+  const latest=latestMap();
+  let list=WORDS.slice();
+  if(mode==='unanswered')list=list.filter(w=>!latest.has(w.id));
+  else if(mode==='review')list=list.filter(w=>latest.has(w.id)&&latest.get(w.id).status!=='○');
+  else if(mode==='incorrect')list=list.filter(w=>latest.get(w.id)?.status==='×');
+  else if(mode==='random'){
+    for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]];}
+  }
+  queue=list;cursor=0;stage=0;usedHint=false;justGraded=false;render();
+}
+function writeExample(el,w){
+  const t=w.example;const key=w.reading;const i=t.indexOf(key);
+  el.replaceChildren();
+  if(i<0){el.textContent=t;return}
+  el.appendChild(document.createTextNode(t.slice(0,i)));
+  const mark=document.createElement('span');mark.className='target';mark.textContent=key;el.appendChild(mark);
+  el.appendChild(document.createTextNode(t.slice(i+key.length)));
+}
+function addButton(container,text,cls,fn){const b=document.createElement('button');b.type='button';b.className='btn '+cls;b.textContent=text;b.addEventListener('click',fn);container.appendChild(b);return b}
+function changeIndex(to){if(to<0||to>=queue.length)return;cursor=to;stage=0;usedHint=false;justGraded=false;render();window.scrollTo({top:0,behavior:'instant'});}
+function hint(){stage=1;usedHint=true;render()}
+function answer(){stage=2;render()}
+function grade(status){
+  if(stage<2||justGraded)return;
+  const w=queue[cursor];
+  attempts.push({id:w.id,status,at:new Date().toISOString(),hintShown:usedHint});
+  persist();justGraded=true;render();toast('採点を記録しました');
+}
+function render(){
+  const latest=latestMap();
+  const done=latest.size;
+  const allCorrect=[...latest.values()].filter(a=>a.status==='○').length;
+  $('stats').textContent=`学習済み ${done} / 130`;
+  $('progress').style.width=(done/130*100)+'%';
+  $('questionCard').hidden=false;
+  const actions=$('actions'),nav=$('navigation');
+  actions.replaceChildren();nav.replaceChildren();
+  if(queue.length===0){
+    $('questionCount').textContent='該当する問題はありません';$('questionTag').textContent='';
+    $('example').textContent='この条件に一致する問題はありません。';
+    $('reading').textContent='上のメニューから別の条件を選んでください。';
+    $('hintBox').hidden=true;$('answerBox').hidden=true;$('lastStatus').hidden=true;
+    addButton(actions,'全130問を表示','primary',()=>{$('filter').value='all';buildQueue('all')});
+    return;
+  }
+  const w=queue[cursor];
+  $('questionCount').textContent=`問題 ${cursor+1} / ${queue.length}　·　No.${w.id}`;
+  $('questionTag').textContent=w.group;
+  writeExample($('example'),w);
+  $('reading').textContent=`読み：${w.reading}`;
+  $('hintBox').hidden=stage<1;
+  $('answerBox').hidden=stage<2;
+  if(stage>=1)$('hintKana').textContent=w.hintKana;
+  if(stage>=2){$('answer').textContent=w.answer;$('hintKanji').textContent=w.hintKanji+'（'+w.hintKana+'）';$('meaning').textContent='意味：'+w.meaning;}
+  if(stage===0){
+    addButton(actions,'音読みのヒント（ひらがな）を見る','secondary',hint);
+    addButton(actions,'ヒントなしで正解を見る','primary',answer);
+  }else if(stage===1){
+    addButton(actions,'正解と音読みの漢字を見る','primary',answer);
+  }else if(!justGraded){
+    const gradeArea=document.createElement('div');gradeArea.className='grades';actions.appendChild(gradeArea);
+    addButton(gradeArea,'○ 正解','good',()=>grade('○'));
+    addButton(gradeArea,'× 不正解','bad',()=>grade('×'));
+    addButton(gradeArea,'△ ヒントを見て正解','hinted',()=>grade('△'));
+  }else{
+    addButton(actions,'次の問題へ','primary',()=>{
+      if(cursor<queue.length-1)changeIndex(cursor+1);
+      else toast('選択中の問題を最後まで表示しました');
+    });
+    addButton(actions,'この問題をもう一度解く','secondary',()=>{stage=0;usedHint=false;justGraded=false;render()});
+  }
+  const prev=addButton(nav,'← 前の問題','soft',()=>changeIndex(cursor-1));prev.disabled=cursor===0;
+  const next=addButton(nav,'次の問題 →','soft',()=>changeIndex(cursor+1));next.disabled=cursor===queue.length-1;
+  const last=latest.get(w.id),status=$('lastStatus');
+  status.hidden=!last;
+  if(last){status.textContent=`この問題の直近の判定：${last.status}（${formatDate(last.at)}）`}
+}
+function formatDate(iso){
+  const d=new Date(iso);if(Number.isNaN(d.getTime()))return iso;
+  return d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+function csvCell(s){let v=String(s??'');return /[,\"\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+function makeCSV(){
+  const header=['記録日時','問題番号','訓読み','例文','音読みヒント_ひらがな','音読みヒント_漢字','正解','判定','ヒント表示','意味'];
+  const data=attempts.map(a=>{const w=WORDS[a.id-1];return [a.at,a.id,w.reading,w.example,w.hintKana,w.hintKanji,w.answer,a.status,a.hintShown?'はい':'いいえ',w.meaning]});
+  return '\ufeff'+[header,...data].map(row=>row.map(csvCell).join(',')).join('\r\n')+'\r\n';
+}
+async function deliverBlob(filename,content,mime){
+  const blob=new Blob([content],{type:mime});
+  // iPadでは共有シートを優先。対応しないブラウザではダウンロードに切り替える。
+  try{
+    if(/iPad|iPhone|iPod/.test(navigator.userAgent)&&navigator.share&&navigator.canShare){
+      const f=new File([blob],filename,{type:mime});
+      if(navigator.canShare({files:[f]})){
+        await navigator.share({files:[f],title:filename});toast('共有先でファイルを保存してください');return;
+      }
+    }
+  }catch(e){if(e?.name==='AbortError')return;}
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
+  toast('ファイルを保存しました');
+}
+function parseCSV(t){
+  const out=[];let row=[],field='',quoted=false;
+  t=t.replace(/^\ufeff/,'');
+  for(let i=0;i<t.length;i++){
+    const ch=t[i];
+    if(quoted){if(ch==='"'){if(t[i+1]==='"'){field+='"';i++;}else quoted=false;}else field+=ch;}
+    else if(ch==='"')quoted=true;
+    else if(ch===','){row.push(field);field='';}
+    else if(ch==='\n'){row.push(field.replace(/\r$/,''));if(row.some(v=>v!==''))out.push(row);row=[];field='';}
+    else field+=ch;
+  }
+  if(field!==''||row.length){row.push(field.replace(/\r$/,''));out.push(row)}
+  if(quoted)throw new Error('CSVの引用符が閉じられていません');
+  return out;
+}
+function cleanRecords(input){
+  if(!Array.isArray(input))throw new Error('記録の形式が違います');
+  const cleaned=input.filter(validAttempt).map(a=>({id:a.id,status:a.status,at:a.at,hintShown:!!a.hintShown}));
+  if(input.length>0&&cleaned.length===0)throw new Error('有効な採点記録がありません');
+  return cleaned;
+}
+async function importFile(e){
+  const file=e.target.files?.[0];if(!file)return;
+  try{
+    const text=await file.text();let incoming;
+    if(file.name.toLowerCase().endsWith('.json')){
+      let data=JSON.parse(text);incoming=cleanRecords(Array.isArray(data)?data:data.attempts);
+    }else{
+      const data=parseCSV(text);const header=data.shift();
+      const dateIndex=header.indexOf('記録日時'),idIndex=header.indexOf('問題番号'),gradeIndex=header.indexOf('判定'),hintIndex=header.indexOf('ヒント表示');
+      if([dateIndex,idIndex,gradeIndex].some(i=>i<0))throw new Error('この教材で出力したCSVを選んでください');
+      incoming=cleanRecords(data.map(row=>({id:Number(row[idIndex]),status:row[gradeIndex],at:row[dateIndex],hintShown:hintIndex>=0&&row[hintIndex]==='はい'})));
+    }
+    if(!confirm(`${incoming.length}回分の採点記録を読み込み、現在の${attempts.length}回分と置き換えます。よろしいですか？`))return;
+    attempts=incoming;persist();buildQueue($('filter').value);toast(`${incoming.length}回分の記録を復元しました`);
+  }catch(err){alert('読み込みに失敗しました：'+(err?.message||String(err)))}
+  finally{e.target.value=''}
+}
+$('filter').addEventListener('change',e=>buildQueue(e.target.value));
+$('csvExport').addEventListener('click',()=>deliverBlob('漢検_訓読み_採点履歴_'+new Date().toISOString().slice(0,10)+'.csv',makeCSV(),'text/csv;charset=utf-8'));
+$('jsonExport').addEventListener('click',()=>deliverBlob('漢検_訓読み_バックアップ_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({version:1,attempts,exportedAt:new Date().toISOString()},null,2),'application/json;charset=utf-8'));
+$('fileInput').addEventListener('change',importFile);
+$('resetHistory').addEventListener('click',()=>{
+  if(confirm(`すべての採点記録（${attempts.length}回分）を削除します。復元するには保存済みのCSV/JSONが必要です。削除してよろしいですか？`)){
+    attempts=[];persist();buildQueue('all');$('filter').value='all';toast('採点記録を初期化しました');
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key==='1'&&stage===0)hint();
+  else if(e.key==='2'&&stage<2)answer();
+  else if(e.key==='ArrowRight')changeIndex(cursor+1);
+  else if(e.key==='ArrowLeft')changeIndex(cursor-1);
+});
+storageRead();buildQueue('all');
+</script>
+</body>
+</html>
